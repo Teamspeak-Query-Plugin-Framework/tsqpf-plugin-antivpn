@@ -35,8 +35,6 @@ public class Score {
 
             JSONObject json = new JSONObject(respone.toString());
 
-            logger.printDebug("Score: " + json.getInt("fraud_score"));
-
             return json.getInt("fraud_score");
 
         } catch (Exception e) {

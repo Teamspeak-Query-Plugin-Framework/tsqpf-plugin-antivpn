@@ -46,18 +46,21 @@ public class AntiVPN extends TeamspeakPlugin {
     @Override
     public void onClientJoin(ClientJoinEvent clientJoinEvent) {
 
+        String nick = getAPI().getDatabaseClientByUId(clientJoinEvent.getUniqueClientIdentifier()).getNickname();
+
         try {
 
-            getLogger().printDebug("New client ip: " + getAPI().getClientInfo(clientJoinEvent.getInvokerId()).getIp());
-
             if (Score.getScore(
-                    getAPI().getClientInfo(clientJoinEvent.getInvokerId()).getIp(),
+                    getAPI().getClientInfo(clientJoinEvent.getClientId()).getIp(),
                     getLogger()
             ) >= Integer.parseInt(getConfig().readValue("scoreLimit"))) {
 
                 if (flagUseGroupWhitelist) {
 
-                    List<Integer> clientGroups = Arrays.stream(getAPI().getClientByUId(clientJoinEvent.getInvokerUniqueId()).getServerGroups())
+                    getLogger().printDebug("UID: "+clientJoinEvent.getUniqueClientIdentifier());
+
+                    List<Integer> clientGroups = Arrays.stream(
+                            getAPI().getClientByUId(clientJoinEvent.getUniqueClientIdentifier()).getServerGroups())
                             .boxed()
                             .collect(Collectors.toList());
 
@@ -70,11 +73,13 @@ public class AntiVPN extends TeamspeakPlugin {
 
                 }
 
-                getAPI().kickClientFromServer(getConfig().readValue("messageUserKick"), clientJoinEvent.getInvokerId());
+                getLogger().printInfo("Client " + nick + " was flagged and removed from server.");
+                getAPI().kickClientFromServer(getConfig().readValue("messageUserKick"), clientJoinEvent.getClientId());
 
             }
         } catch (Exception e) {
             getLogger().printError("An unexpected error occurred whilst trying to check background of user, appending info: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
