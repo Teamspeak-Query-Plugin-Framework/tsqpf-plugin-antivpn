@@ -45,28 +45,36 @@ public class AntiVPN extends TeamspeakPlugin {
 
     @Override
     public void onClientJoin(ClientJoinEvent clientJoinEvent) {
-        if (Score.getScore(
-            getAPI().getClientInfo(clientJoinEvent.getInvokerId()).getIp(),
-                getLogger()
-        ) >= Integer.parseInt(getConfig().readValue("scoreLimit"))) {
 
-            if (flagUseGroupWhitelist) {
+        try {
 
-                List<Integer> clientGroups = Arrays.stream(getAPI().getClientByUId(clientJoinEvent.getInvokerUniqueId()).getServerGroups())
-                        .boxed()
-                        .collect(Collectors.toList());
+            getLogger().printDebug("New client ip: " + getAPI().getClientInfo(clientJoinEvent.getInvokerId()).getIp());
 
-                for (Integer group : clientGroups) {
+            if (Score.getScore(
+                    getAPI().getClientInfo(clientJoinEvent.getInvokerId()).getIp(),
+                    getLogger()
+            ) >= Integer.parseInt(getConfig().readValue("scoreLimit"))) {
 
-                    if (whitelistedGroups.contains(group))
-                        return;
+                if (flagUseGroupWhitelist) {
+
+                    List<Integer> clientGroups = Arrays.stream(getAPI().getClientByUId(clientJoinEvent.getInvokerUniqueId()).getServerGroups())
+                            .boxed()
+                            .collect(Collectors.toList());
+
+                    for (Integer group : clientGroups) {
+
+                        if (whitelistedGroups.contains(group))
+                            return;
+
+                    }
 
                 }
 
+                getAPI().kickClientFromServer(getConfig().readValue("messageUserKick"), clientJoinEvent.getInvokerId());
+
             }
-
-            getAPI().kickClientFromServer(getConfig().readValue("messageUserKick"), clientJoinEvent.getInvokerId());
-
+        } catch (Exception e) {
+            getLogger().printError("An unexpected error occurred whilst trying to check background of user, appending info: " + e.getMessage());
         }
     }
 }
