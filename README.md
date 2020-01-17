@@ -3,7 +3,7 @@ Prevent users of your Teamspeak server from connecting while using a VPN service
 
 ## 💡 How does it work?
 
-If a user connect your server, the plugin run a background check if the users IP is listed in a database of VPN server IPs.
+If a user connects your server, the plugin runs a background check if the users IP is listed in a database of VPN server IPs.
 
 ## 🚀 Gettings started
 
