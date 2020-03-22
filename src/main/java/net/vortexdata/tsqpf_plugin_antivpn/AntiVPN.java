@@ -17,8 +17,9 @@ public class AntiVPN extends TeamspeakPlugin {
 
     @Override
     public void onEnable() {
-        getConfig().setDefault("scoreLimit", "99");
+        getConfig().setDefault("scoreLimit", "90");
         getConfig().setDefault("useGroupWhitelist", "false");
+        getConfig().setDefault("ignoreLocalhost", "false");
         getConfig().setDefault("whitelistedGroupIds", "1");
         getConfig().setDefault("messageUserKick", "VPN connections are not allowed.");
         getConfig().saveAll();
@@ -47,6 +48,10 @@ public class AntiVPN extends TeamspeakPlugin {
     public void onClientJoin(ClientJoinEvent clientJoinEvent) {
 
         String nick = getAPI().getDatabaseClientByUId(clientJoinEvent.getUniqueClientIdentifier()).getNickname();
+
+        // Check if connection is localhost
+        if (getConfig().readValue("ignoreLocalhost").equalsIgnoreCase("true") && getAPI().getClientInfo(clientJoinEvent.getClientId()).getIp().equalsIgnoreCase("127.0.0.1"))
+            return;
 
         try {
 
